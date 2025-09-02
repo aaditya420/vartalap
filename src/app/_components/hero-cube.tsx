@@ -145,9 +145,14 @@ export default function HeroCube() {
     let turning = false
     let turnAxis: Axis = 'y'
     let layer = 0
-    let angle = 0
-    const turnDuration = 0.6
+    // Track eased, time-based rotation for smoothness
+    let turnElapsed = 0
+    const turnDuration = 1.5 // longer, smoother turn
     let dir = 1
+    const HALF_PI = Math.PI / 2
+    // Smooth ease-in-out to avoid snappy start/stop
+    const easeInOutCubic = (t: number) =>
+      t < 0.5 ? 4 * t * t * t : 1 - Math.pow(-2 * t + 2, 3) / 2
 
     function attachLayer(a: Axis, l: number) {
       // Reset pivot to cube center and clear any previous rotation
@@ -247,7 +252,7 @@ export default function HeroCube() {
       nextTurnTime -= dt
       if (!turning && nextTurnTime <= 0) {
         turning = true
-        angle = 0
+        turnElapsed = 0
         turnAxis = pick(axes)
         layer = pick([-1, 0, 1] as const)
         dir = Math.random() > 0.5 ? 1 : -1
@@ -255,16 +260,19 @@ export default function HeroCube() {
       }
 
       if (turning) {
-        const step = (Math.PI / 2 / turnDuration) * dt * dir
-        angle += Math.abs(step)
-        addAxisRotation(turnGroup, turnAxis, step)
-        if (angle >= Math.PI / 2 - 1e-3) {
-          // Snap and finish
-          setAxisRotation(turnGroup, turnAxis, (Math.PI / 2) * dir)
+        // Time-based eased rotation 0..HALF_PI
+        turnElapsed += dt
+        const t = Math.min(1, Math.max(0, turnElapsed / turnDuration))
+        const eased = easeInOutCubic(t)
+        const targetAngle = eased * HALF_PI * dir
+        setAxisRotation(turnGroup, turnAxis, targetAngle)
+        if (t >= 1 - 1e-4) {
+          // Finish precisely at HALF_PI, then bake
+          setAxisRotation(turnGroup, turnAxis, HALF_PI * dir)
           bakeAndUpdateIndices(turnAxis, layer, dir)
           setAxisRotation(turnGroup, turnAxis, 0)
           turning = false
-          nextTurnTime = 1.6 + Math.random() * 1.2
+          nextTurnTime = 1.1 + Math.random() * 1.2
         }
       }
 
