@@ -1,0 +1,33 @@
+<!-- This would be a PNG file, but I'll create an SVG that browsers can use -->
+<svg xmlns="http://www.w3.org/2000/svg" width="180" height="180" viewBox="0 0 180 180" fill="none">
+  <!-- Background -->
+  <rect width="180" height="180" rx="40" fill="#000000"/>
+  
+  <!-- Microphone body with gradient -->
+  <defs>
+    <linearGradient id="grad" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" style="stop-color:#f97316"/>
+      <stop offset="100%" style="stop-color:#ea580c"/>
+    </linearGradient>
+  </defs>
+  
+  <!-- Microphone capsule -->
+  <rect x="70" y="40" width="40" height="65" rx="20" fill="url(#grad)"/>
+  
+  <!-- Microphone stand -->
+  <path d="M90 105 C110 105 125 120 125 140 L125 145 L55 145 L55 140 C55 120 70 105 90 105 Z" fill="#6b7280"/>
+  
+  <!-- Microphone base -->
+  <rect x="85" y="145" width="10" height="10" fill="#6b7280"/>
+  
+  <!-- Sound waves -->
+  <path d="M35 87.5 C35 110 52.5 127.5 75 127.5" stroke="#f97316" stroke-width="4" fill="none" opacity="0.6"/>
+  <path d="M145 87.5 C145 110 127.5 127.5 105 127.5" stroke="#f97316" stroke-width="4" fill="none" opacity="0.6"/>
+  
+  <!-- Microphone grille -->
+  <line x1="75" y1="50" x2="105" y2="50" stroke="#ffffff" stroke-width="2" opacity="0.7"/>
+  <line x1="75" y1="60" x2="105" y2="60" stroke="#ffffff" stroke-width="2" opacity="0.7"/>
+  <line x1="75" y1="70" x2="105" y2="70" stroke="#ffffff" stroke-width="2" opacity="0.7"/>
+  <line x1="75" y1="80" x2="105" y2="80" stroke="#ffffff" stroke-width="2" opacity="0.7"/>
+  <line x1="75" y1="90" x2="105" y2="90" stroke="#ffffff" stroke-width="2" opacity="0.7"/>
+</svg>

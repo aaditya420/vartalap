@@ -1,0 +1,21 @@
+{
+  "name": "Vartalap - Voice AI for Everyone",
+  "short_name": "Vartalap",
+  "description": "Experience the future of conversational AI with real-time speech processing and advanced voice assistance.",
+  "icons": [
+    {
+      "src": "/favicon.svg",
+      "sizes": "any",
+      "type": "image/svg+xml"
+    },
+    {
+      "src": "/apple-touch-icon.png",
+      "sizes": "180x180",
+      "type": "image/png"
+    }
+  ],
+  "theme_color": "#000000",
+  "background_color": "#000000",
+  "display": "standalone",
+  "start_url": "/"
+}
