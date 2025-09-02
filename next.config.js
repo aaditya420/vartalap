@@ -5,6 +5,16 @@
 import "./src/env.js";
 
 /** @type {import("next").NextConfig} */
-const config = {};
+const config = {
+    images: {
+        remotePatterns: [
+          {
+            protocol: 'https', // or 'http'
+            hostname: 'lh3.googleusercontent.com', // The domain of your external images
+          },
+          // Add more objects for other allowed domains or patterns
+        ],
+      },
+};
 
 export default config;

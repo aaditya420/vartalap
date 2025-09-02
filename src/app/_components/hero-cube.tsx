@@ -1,5 +1,5 @@
 'use client'
-/* eslint-disable @typescript-eslint/no-unsafe-assignment,@typescript-eslint/no-unsafe-member-access,@typescript-eslint/no-unsafe-call,@typescript-eslint/no-redundant-type-constituents,@typescript-eslint/no-unused-vars,@typescript-eslint/no-unsafe-argument */
+/* eslint-disable @typescript-eslint/no-unsafe-assignment,@typescript-eslint/no-unsafe-member-access,@typescript-eslint/no-unsafe-call,@typescript-eslint/no-unused-vars,@typescript-eslint/no-unsafe-argument,@typescript-eslint/no-explicit-any */
 
 import { useEffect, useRef } from 'react'
 import {
@@ -21,6 +21,7 @@ import {
   Object3D,
   BufferGeometry,
   SRGBColorSpace,
+  Clock,
 } from 'three'
 import { RoomEnvironment } from 'three/examples/jsm/environments/RoomEnvironment.js'
 import { RoundedBoxGeometry } from 'three/examples/jsm/geometries/RoundedBoxGeometry.js'
@@ -28,7 +29,7 @@ import { RoundedBoxGeometry } from 'three/examples/jsm/geometries/RoundedBoxGeom
 
 export default function HeroCube() {
   const containerRef = useRef<HTMLDivElement>(null)
-  const rendererRef = useRef<WebGLRenderer | null>(null)
+  const rendererRef = useRef<any>(null)
 
   useEffect(() => {
     const container = containerRef.current!
@@ -96,7 +97,7 @@ export default function HeroCube() {
       envMapIntensity: 1.2,
     })
 
-    const cubelets: Mesh[] = []
+    const cubelets: any[] = []
     for (let i = -1; i <= 1; i++) {
       for (let j = -1; j <= 1; j++) {
         for (let k = -1; k <= 1; k++) {
@@ -200,7 +201,7 @@ export default function HeroCube() {
       turnGroup.rotation.set(0, 0, 0)
     }
 
-    const clock = new THREE.Clock()
+    const clock = new Clock()
 
     // Cursor-driven orientation: rotate so the cube's corner (1,1,1)
     // points toward the mouse cursor ray from the camera.
@@ -226,12 +227,12 @@ export default function HeroCube() {
     }
     window.addEventListener('pointermove', onPointerMove)
     // helpers to mutate rotation without index access
-    const addAxisRotation = (obj: THREE.Object3D, a: Axis, delta: number) => {
+    const addAxisRotation = (obj: any, a: Axis, delta: number) => {
       if (a === 'x') obj.rotation.x += delta
       else if (a === 'y') obj.rotation.y += delta
       else obj.rotation.z += delta
     }
-    const setAxisRotation = (obj: THREE.Object3D, a: Axis, value: number) => {
+    const setAxisRotation = (obj: any, a: Axis, value: number) => {
       if (a === 'x') obj.rotation.x = value
       else if (a === 'y') obj.rotation.y = value
       else obj.rotation.z = value
