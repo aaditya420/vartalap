@@ -13,7 +13,7 @@ export default async function ComingSoon() {
   }
 
   return (
-    <main className="relative min-h-screen text-white bg-hero-dark">
+    <main className="relative min-h-screen text-white bg-hero-dark flex flex-col">
       <div className="vignette absolute inset-0" />
       {/* Header */}
       <header className="relative z-10 flex justify-between items-center p-6 md:p-8">
@@ -40,6 +40,13 @@ export default async function ComingSoon() {
           <SignOutButton />
         </div>
       </header>
+
+      {/* Centered Coming Soon Message */}
+      <section className="relative z-10 flex-1 flex items-center justify-center px-6 md:px-8">
+        <h1 className="font-display text-5xl md:text-7xl lg:text-8xl tracking-tight text-white/90">
+          Coming Soon!
+        </h1>
+      </section>
     </main>
   );
 }
