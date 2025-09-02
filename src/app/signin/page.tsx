@@ -10,7 +10,8 @@ export default function SignIn() {
   }, [])
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-black via-zinc-800 to-black relative text-white flex items-center justify-center before:absolute before:inset-0 before:bg-gradient-to-tr before:from-white/3 before:via-black/20 before:to-white/8 before:pointer-events-none">
+    <main className="relative min-h-screen text-white bg-hero-dark flex items-center justify-center">
+      <div className="vignette absolute inset-0" />
       <div className="text-center relative z-10">
         <div className="mb-4">
           <div className="w-16 h-16 bg-zinc-800 border border-zinc-700 rounded-lg flex items-center justify-center mx-auto mb-4">
@@ -25,6 +26,6 @@ export default function SignIn() {
           <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-white mx-auto"></div>
         </div>
       </div>
-    </div>
+    </main>
   )
 }
