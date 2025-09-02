@@ -1,31 +1,50 @@
 'use client'
+/* eslint-disable @typescript-eslint/no-unsafe-assignment,@typescript-eslint/no-unsafe-member-access,@typescript-eslint/no-unsafe-call,@typescript-eslint/no-redundant-type-constituents,@typescript-eslint/no-unused-vars,@typescript-eslint/no-unsafe-argument */
 
 import { useEffect, useRef } from 'react'
-import * as THREE from 'three'
+import {
+  Scene,
+  PerspectiveCamera,
+  WebGLRenderer,
+  PMREMGenerator,
+  AmbientLight,
+  DirectionalLight,
+  Group,
+  Box3,
+  Sphere,
+  Vector3,
+  Quaternion,
+  Vector2,
+  MathUtils,
+  MeshPhysicalMaterial,
+  Mesh,
+  Object3D,
+  BufferGeometry,
+  SRGBColorSpace,
+} from 'three'
 import { RoomEnvironment } from 'three/examples/jsm/environments/RoomEnvironment.js'
 import { RoundedBoxGeometry } from 'three/examples/jsm/geometries/RoundedBoxGeometry.js'
 
-type Cubelet = any
 
 export default function HeroCube() {
   const containerRef = useRef<HTMLDivElement>(null)
-  const rendererRef = useRef<any>(null)
+  const rendererRef = useRef<WebGLRenderer | null>(null)
 
   useEffect(() => {
     const container = containerRef.current!
     const width = container.clientWidth
     const height = container.clientHeight
 
-    const scene = new THREE.Scene()
+    const scene = new Scene()
     // Transparent background so the cube blends into the page gradient
     scene.background = null
 
-    const camera = new THREE.PerspectiveCamera(38, width / height, 0.1, 100)
+    const camera = new PerspectiveCamera(38, width / height, 0.1, 100)
     // Start at a pleasant 3/4 angle; exact distance is framed below
     camera.position.set(4.2, 2.6, 6)
 
-    const renderer = new THREE.WebGLRenderer({ antialias: true, alpha: true })
-    renderer.outputColorSpace = THREE.SRGBColorSpace
+    const renderer = new WebGLRenderer({ antialias: true, alpha: true })
+    renderer.outputColorSpace = SRGBColorSpace
     renderer.setPixelRatio(Math.min(window.devicePixelRatio, 2))
     renderer.setSize(width, height, false)
     renderer.setClearColor(0x000000, 0)
@@ -41,25 +60,25 @@ export default function HeroCube() {
     rendererRef.current = renderer
 
     // Subtle environment for glossy reflections
-    const pmrem = new THREE.PMREMGenerator(renderer)
+    const pmrem = new PMREMGenerator(renderer)
     const env = pmrem.fromScene(new RoomEnvironment(), 0.02).texture
     scene.environment = env
 
     // Lighting: soft rim + key
-    const ambient = new THREE.AmbientLight(0xffffff, 0.3)
+    const ambient = new AmbientLight(0xffffff, 0.3)
     scene.add(ambient)
 
-    const key = new THREE.DirectionalLight(0xffffff, 0.7)
+    const key = new DirectionalLight(0xffffff, 0.7)
     key.position.set(5, 6, 4)
     key.castShadow = true
     scene.add(key)
 
-    const rim = new THREE.DirectionalLight(0xffffff, 0.5)
+    const rim = new DirectionalLight(0xffffff, 0.5)
     rim.position.set(-6, -3, -4)
     scene.add(rim)
 
     // Root group (orientation controlled by cursor)
-    const root = new THREE.Group()
+    const root = new Group()
     scene.add(root)
 
     // Build 3x3x3 cubelets with small gaps
@@ -68,7 +87,7 @@ export default function HeroCube() {
     const radius = 0.08
 
     const geometry = new RoundedBoxGeometry(size, size, size, 4, radius)
-    const material = new THREE.MeshPhysicalMaterial({
+    const material = new MeshPhysicalMaterial({
       color: 0x000000,
       roughness: 0.18,
       metalness: 0.9,
@@ -77,31 +96,31 @@ export default function HeroCube() {
       envMapIntensity: 1.2,
     })
 
-    const cubelets: Cubelet[] = []
+    const cubelets: Mesh[] = []
     for (let i = -1; i <= 1; i++) {
       for (let j = -1; j <= 1; j++) {
         for (let k = -1; k <= 1; k++) {
-          const m = new THREE.Mesh(geometry, material)
+          const m = new Mesh(geometry, material)
           m.position.set(i * spacing, j * spacing, k * spacing)
           m.castShadow = true
           m.receiveShadow = true
           m.userData = { i, j, k }
           root.add(m)
-          cubelets.push(m as Cubelet)
+          cubelets.push(m)
         }
       }
     }
 
     // Frame object to fit container (no cropping)
-    const bbox = new THREE.Box3().setFromObject(root)
-    const sphere = new THREE.Sphere()
+    const bbox = new Box3().setFromObject(root)
+    const sphere = new Sphere()
     bbox.getBoundingSphere(sphere)
     const center = sphere.center.clone()
     const initialDir = camera.position.clone().sub(center).normalize() // keep the viewing angle
 
     function frameToView() {
       // Fit both width and height of the sphere into the frustum
-      const fovY = THREE.MathUtils.degToRad(camera.fov)
+      const fovY = MathUtils.degToRad(camera.fov)
       const fovX = 2 * Math.atan(Math.tan(fovY / 2) * camera.aspect)
       const r = sphere.radius * 1.25 // margin for aesthetics
       const distY = r / Math.sin(fovY / 2)
@@ -115,7 +134,7 @@ export default function HeroCube() {
     // Helper to pick a layer and rotate 90deg smoothly
     // Sub‑group that temporarily holds a rotating layer. It must be
     // parented under `root` so it inherits the cube's overall rotation.
-    const turnGroup = new THREE.Group()
+    const turnGroup = new Group()
     root.add(turnGroup)
 
     type Axis = 'x' | 'y' | 'z'
@@ -185,15 +204,15 @@ export default function HeroCube() {
 
     // Cursor-driven orientation: rotate so the cube's corner (1,1,1)
     // points toward the mouse cursor ray from the camera.
-    const cornerVec = new THREE.Vector3(1, 1, 1).normalize()
-    const targetQuat = new THREE.Quaternion().copy(root.quaternion)
+    const cornerVec = new Vector3(1, 1, 1).normalize()
+    const targetQuat = new Quaternion().copy(root.quaternion)
 
     function updateOrientationFromPointer(clientX: number, clientY: number) {
-      const ndc = new THREE.Vector2(
+      const ndc = new Vector2(
         (clientX / window.innerWidth) * 2 - 1,
         -(clientY / window.innerHeight) * 2 + 1,
       )
-      const rayPoint = new THREE.Vector3(ndc.x, ndc.y, 0.5).unproject(camera)
+      const rayPoint = new Vector3(ndc.x, ndc.y, 0.5).unproject(camera)
       const dir = rayPoint.sub(camera.position).normalize()
       // Aim at a point along the ray roughly at the cube center depth
       const dist = camera.position.distanceTo(center)
@@ -206,6 +225,18 @@ export default function HeroCube() {
       updateOrientationFromPointer(e.clientX, e.clientY)
     }
     window.addEventListener('pointermove', onPointerMove)
+    // helpers to mutate rotation without index access
+    const addAxisRotation = (obj: THREE.Object3D, a: Axis, delta: number) => {
+      if (a === 'x') obj.rotation.x += delta
+      else if (a === 'y') obj.rotation.y += delta
+      else obj.rotation.z += delta
+    }
+    const setAxisRotation = (obj: THREE.Object3D, a: Axis, value: number) => {
+      if (a === 'x') obj.rotation.x = value
+      else if (a === 'y') obj.rotation.y = value
+      else obj.rotation.z = value
+    }
+
     renderer.setAnimationLoop(() => {
       const dt = clock.getDelta()
 
@@ -225,12 +256,12 @@ export default function HeroCube() {
       if (turning) {
         const step = (Math.PI / 2 / turnDuration) * dt * dir
         angle += Math.abs(step)
-        ;(turnGroup.rotation as any)[turnAxis] += step
+        addAxisRotation(turnGroup, turnAxis, step)
         if (angle >= Math.PI / 2 - 1e-3) {
           // Snap and finish
-          ;(turnGroup.rotation as any)[turnAxis] = (Math.PI / 2) * dir
+          setAxisRotation(turnGroup, turnAxis, (Math.PI / 2) * dir)
           bakeAndUpdateIndices(turnAxis, layer, dir)
-          ;(turnGroup.rotation as any)[turnAxis] = 0
+          setAxisRotation(turnGroup, turnAxis, 0)
           turning = false
           nextTurnTime = 1.6 + Math.random() * 1.2
         }

@@ -1,12 +1,12 @@
 'use client'
 
-import { signIn, getProviders } from "next-auth/react"
+import { signIn } from "next-auth/react"
 import { useEffect } from "react"
 
 export default function SignIn() {
   useEffect(() => {
     // Automatically redirect to Google OAuth
-    signIn("google", { callbackUrl: "/home" })
+    void signIn("google", { callbackUrl: "/home" })
   }, [])
 
   return (

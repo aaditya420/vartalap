@@ -1,4 +1,5 @@
 import { redirect } from "next/navigation";
+import Image from "next/image";
 
 import { auth } from "~/server/auth";
 import { SignOutButton } from "../_components/sign-out-button";
@@ -27,10 +28,12 @@ export default async function ComingSoon() {
 
         <div className="flex items-center gap-4">
           <div className="flex items-center gap-2">
-            <img
-              src={session.user.image || "/placeholder-avatar.png"}
-              alt={session.user.name || "User"}
-              className="w-8 h-8 rounded-full border border-white/10"
+            <Image
+              src={session.user.image ?? "/placeholder-avatar.png"}
+              alt={session.user.name ?? "User"}
+              width={32}
+              height={32}
+              className="w-8 h-8 rounded-full border border-white/10 object-cover"
             />
             <span className="text-sm font-medium">{session.user.name}</span>
           </div>
